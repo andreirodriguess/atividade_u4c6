@@ -1,15 +1,18 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "pico/stdlib.h"
 #include "hardware/i2c.h"
 #include "inc/ssd1306.h"
 #include "inc/font.h"
+#include "hardware/pio.h"
 #define I2C_PORT i2c1
 #define I2C_SDA 14
 #define I2C_SCL 15
 #define endereco 0x3C
-
+//incluindo arquivo pio
+#include "atividade_u4c6.pio.h"
 
 ssd1306_t ssd; // Inicializa a estrutura do display
 
