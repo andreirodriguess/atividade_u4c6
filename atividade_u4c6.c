@@ -92,7 +92,6 @@ ssd1306_t ssd; // Inicializa a estrutura do display
 
 int main()
 {
-  printf("Iniciando o programa\n");
     PIO pio = pio0;
     uint16_t i;
     uint32_t valor_led;
@@ -123,11 +122,8 @@ int main()
   ssd1306_send_data(&ssd);
 
   while (true)
-  {
-    animacao_quadrado_azul(pio, sm, 0.0, 0.0, 1.0);    
-    apresentar_display(ssd, "BEM VINDO", "AO", "BITDOG LAB");
-    sleep_ms(2000);
-    apresentar_display(ssd, "OLA", "MUNDO", "EMBARCADO");
+  {  
+    apresentar_display(ssd, "abcdefghijk", " lmnopqrst ", "uvwxyz");
     sleep_ms(2000);
   }
 }
