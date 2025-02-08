@@ -51,7 +51,9 @@ target_sources(atividade_u4c6 PRIVATE atividade_u4c6.c)
 # Add the standard library to the build
 target_link_libraries(atividade_u4c6
         pico_stdlib
-        hardware_pio)
+        hardware_pio
+        hardware_adc
+        pico_bootrom)
 
 # Add the standard include files to the build
 target_include_directories(atividade_u4c6 PRIVATE
