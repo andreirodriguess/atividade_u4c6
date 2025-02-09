@@ -6,20 +6,36 @@
 #include "hardware/i2c.h"
 #include "inc/ssd1306.h"
 #include "hardware/clocks.h"
-#include "inc/font.h"
 #include "hardware/pio.h"
+//incluindo arquivo pio
+#include "atividade_u4c6.pio.h"
+//arquivo com as fontes dos caracteres
+
+#include "inc/font.h"
 #define I2C_PORT i2c1
 #define I2C_SDA 14
 #define I2C_SCL 15
 #define endereco 0x3C
 // número de LEDs
 #define NUM_PIXELS 25
-
 // pino de saída
 #define OUT_PIN 7
+// pinos dos leds
+#define red_pin 13
+#define blue_pin 12
+#define green_pin 11
+// pinos do botoes
+#define button_a 5
+#define button_b 6
 
-//incluindo arquivo pio
-#include "atividade_u4c6.pio.h"
+static volatile uint32_t last_time = 0; // Armazena o tempo do último evento (em microssegundos)
+bool green_state; //armazena o estado do led verde
+bool blue_state; //armazena o estado do led vermelho
+
+
+// variavel para armazenar o numero apresentado
+int numero_apresentado = 0;
+
 
 
 // rotina para definição da intensidade de cores do led
@@ -87,6 +103,8 @@ void animacao_quadrado_azul(PIO pio, uint sm, double r, double g, double b)
     }
 }
 
+// rotina da interrupção
+static void gpio_irq_handler(uint gpio, uint32_t events);
 
 ssd1306_t ssd; // Inicializa a estrutura do display
 
@@ -98,13 +116,33 @@ int main()
      //
     stdio_init_all(); // Inicializa a comunicação com o terminal
 
-    // Inicializa todos os códigos stdio padrão que estão ligados ao binário.
-    stdio_init_all();
-
     // configurações da PIO
     uint offset = pio_add_program(pio, &main_program);
     uint sm = pio_claim_unused_sm(pio, true);
-    main_program_init(pio, sm, offset, OUT_PIN);  
+    main_program_init(pio, sm, offset, OUT_PIN);
+    /*funcoes dos botoes*/
+        //inicializar leds
+        gpio_init(red_pin);
+        gpio_init(blue_pin);
+        gpio_init(green_pin);
+    
+        //
+        gpio_set_dir(red_pin, GPIO_OUT);
+        gpio_set_dir(blue_pin, GPIO_OUT);
+        gpio_set_dir(green_pin, GPIO_OUT);
+        // inicializar o botão de interrupção - GPIO5
+        gpio_init(button_a);
+        gpio_set_dir(button_a, GPIO_IN);
+        gpio_pull_up(button_a);
+    
+        // inicializar o botão de interrupção - GPIO6
+        gpio_init(button_b);
+        gpio_set_dir(button_b, GPIO_IN);
+        gpio_pull_up(button_b);
+    // interrupção da gpio habilitada
+    gpio_set_irq_enabled_with_callback(button_a, GPIO_IRQ_EDGE_FALL, 1, &gpio_irq_handler);
+    gpio_set_irq_enabled_with_callback(button_b, GPIO_IRQ_EDGE_FALL, 1, &gpio_irq_handler);
+
   // I2C Initialisation. Using it at 400Khz.
   i2c_init(I2C_PORT, 400 * 1000);
 
@@ -122,8 +160,33 @@ int main()
   ssd1306_send_data(&ssd);
 
   while (true)
-  {  
+  { 
+    animacao_quadrado_azul(pio, sm, 0.0, 0.0, 1.0);
     apresentar_display(ssd, "abcdefghijk", " lmnopqrst ", "uvwxyz");
-    sleep_ms(2000);
   }
+}
+
+// rotina de interrupção
+static void gpio_irq_handler(uint gpio, uint32_t events)//alterna o estado do led rgb
+{
+    uint32_t current_time = to_us_since_boot(get_absolute_time());
+
+    // Verifica se passou tempo suficiente desde o último evento (debouncing)
+    if (current_time - last_time > 300000) // 300 ms 
+    {
+        last_time = current_time; // Atualiza o tempo do último evento
+
+        if (gpio == button_a) // Se for o botão A, incrementa
+        {
+            gpio_put(green_pin, !green_state);
+            green_state = !green_state;
+            printf("alterando led verde\n");
+        }
+        else if (gpio == button_b) // Se for o botão B, decrementa
+        {
+            gpio_put(blue_pin, !blue_state);
+            blue_state = !blue_state;
+            printf("alterando led azul\n");
+        }
+   }
 }
