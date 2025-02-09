@@ -237,6 +237,7 @@ static void gpio_irq_handler(uint gpio, uint32_t events)
         {
             gpio_put(green_pin, !green_state);
             green_state = !green_state;
+            apresentar_display(ssd, " Alterando", 'O', " Led verde...");
             printf("Alternando LED verde\n");
         }
         else if (gpio == button_b) // Se o botão B for pressionado, alterna o LED azul
@@ -244,6 +245,7 @@ static void gpio_irq_handler(uint gpio, uint32_t events)
             gpio_put(blue_pin, !blue_state);
             blue_state = !blue_state;
             printf("Alternando LED azul\n");
+            apresentar_display(ssd, " Alterando", 'O', " Led azul...");
         }
     }
 }
