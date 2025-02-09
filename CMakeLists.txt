@@ -42,11 +42,20 @@ pico_set_program_version(atividade_u4c6 "0.1")
 
 # Modify the below lines to enable/disable output over UART/USB
 pico_enable_stdio_uart(atividade_u4c6 0)
+pico_enable_stdio_uart(atividade_u4c6 1)
+pico_enable_stdio_usb(atividade_u4c6 0)
 pico_enable_stdio_usb(atividade_u4c6 1)
+
+pico_generate_pio_header(atividade_u4c6 ${CMAKE_CURRENT_LIST_DIR}/atividade_u4c6.pio)
+
+target_sources(atividade_u4c6 PRIVATE atividade_u4c6.c)
 
 # Add the standard library to the build
 target_link_libraries(atividade_u4c6
-        pico_stdlib)
+        pico_stdlib
+        hardware_pio
+        hardware_adc
+        pico_bootrom)
 
 # Add the standard include files to the build
 target_include_directories(atividade_u4c6 PRIVATE
@@ -59,4 +68,3 @@ target_link_libraries(atividade_u4c6
         )
 
 pico_add_extra_outputs(atividade_u4c6)
-
