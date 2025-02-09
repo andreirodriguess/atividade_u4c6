@@ -42,6 +42,8 @@ pico_set_program_version(atividade_u4c6 "0.1")
 
 # Modify the below lines to enable/disable output over UART/USB
 pico_enable_stdio_uart(atividade_u4c6 0)
+pico_enable_stdio_uart(atividade_u4c6 1)
+pico_enable_stdio_usb(atividade_u4c6 0)
 pico_enable_stdio_usb(atividade_u4c6 1)
 
 pico_generate_pio_header(atividade_u4c6 ${CMAKE_CURRENT_LIST_DIR}/atividade_u4c6.pio)
