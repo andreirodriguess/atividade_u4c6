@@ -35,3 +35,6 @@ Este projeto utiliza o **Raspberry Pi Pico (RP2040)** para controlar uma **matri
 
 ### Matrícula
 **TIC370100444**
+
+### Link do video apresentando o projeto:
+https://youtu.be/8_Lj7j_1q2g?si=gJs8lzAIQrvC3qHS
