@@ -202,16 +202,18 @@ void ssd1306_draw_string(ssd1306_t *ssd, const char *str, uint8_t x, uint8_t y)
 }
 
 // Função para apresentar uma mensagem no display
-void apresentar_display( ssd1306_t ssd, char *frase1, char *frase2, char *frase3)
+void apresentar_display( ssd1306_t ssd, char *frase1, char c, char *frase3)
     
 {
     bool cor = true;
     cor = !cor;
+    uint8_t x = (128 - 8) / 2; // Centraliza na largura (horizontalmente)
+    uint8_t y = (64 - 8) / 2;  // Centraliza na altura (verticalmente)
     // Atualiza o conteúdo do display com animações
     ssd1306_fill(&ssd, !cor); // Limpa o display
     ssd1306_rect(&ssd, 3, 3, 122, 58, cor, !cor); // Desenha um retângulo
     ssd1306_draw_string(&ssd, frase1, 8, 10); // Desenha uma string
-    ssd1306_draw_string(&ssd, frase2, 20, 30); // Desenha uma string
+    ssd1306_draw_char(&ssd, c, x, y);
     ssd1306_draw_string(&ssd, frase3, 15, 48); // Desenha uma string      
     ssd1306_send_data(&ssd); // Atualiza o display
 }
