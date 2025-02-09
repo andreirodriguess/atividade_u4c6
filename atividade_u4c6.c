@@ -34,7 +34,7 @@ bool blue_state; //armazena o estado do led vermelho
 
 
 // variavel para armazenar o numero apresentado
-int numero_apresentado = 0;
+int numero_apresentado = 4;
 
 
 
@@ -48,59 +48,89 @@ uint32_t matrix_rgb(double b, double r, double g)
     return (G << 24) | (R << 16) | (B << 8);
 }
 
-void animacao_quadrado_azul(PIO pio, uint sm, double r, double g, double b)
+// definicao dos padroes de numeros
+double padrao_0[25] = {0.0, 0.8, 0.8, 0.8, 0.0,
+    0.0, 0.8, 0.0, 0.8, 0.0,
+    0.0, 0.8, 0.0, 0.8, 0.0,
+    0.0, 0.8, 0.0, 0.8, 0.0,
+    0.0, 0.8, 0.8, 0.8, 0.0};
+
+double padrao_1[25] = {0.0, 0.0, 0.8, 0.0, 0.0,
+    0.0, 0.0, 0.8, 0.8, 0.0,
+    0.0, 0.0, 0.8, 0.0, 0.0,
+    0.0, 0.0, 0.8, 0.0, 0.0,
+    0.0, 0.0, 0.8, 0.0, 0.0};
+
+double padrao_2[25] = {0.0, 0.8, 0.8, 0.8, 0.0,
+    0.0, 0.8, 0.0, 0.0, 0.0,
+    0.0, 0.8, 0.8, 0.8, 0.0,
+    0.0, 0.0, 0.0, 0.8, 0.0,
+    0.0, 0.8, 0.8, 0.8, 0.0};
+
+double padrao_3[25] = {0.0, 0.8, 0.8, 0.8, 0.0,
+    0.0, 0.8, 0.0, 0.0, 0.0,
+    0.0, 0.8, 0.8, 0.8, 0.0,
+    0.0, 0.8, 0.0, 0.0, 0.0,
+    0.0, 0.8, 0.8, 0.8, 0.0};
+
+double padrao_4[25] = {0.0, 0.8, 0.0, 0.8, 0.0,
+    0.0, 0.8, 0.0, 0.8, 0.0,
+    0.0, 0.8, 0.0, 0.8, 0.0,
+    0.8, 0.8, 0.8, 0.8, 0.0,
+    0.0, 0.0, 0.0, 0.8, 0.0};
+
+double padrao_5[25] = {0.0, 0.8, 0.8, 0.8, 0.0,
+    0.0, 0.0, 0.0, 0.8, 0.0,
+    0.0, 0.8, 0.8, 0.8, 0.0,
+    0.0, 0.8, 0.0, 0.0, 0.0,
+    0.0, 0.8, 0.8, 0.8, 0.0};
+
+double padrao_6[25] = {0.0, 0.8, 0.8, 0.8, 0.0,
+    0.0, 0.0, 0.0, 0.8, 0.0,
+    0.0, 0.8, 0.8, 0.8, 0.0,
+    0.0, 0.8, 0.0, 0.8, 0.0,
+    0.0, 0.8, 0.8, 0.8, 0.0};
+
+double padrao_7[25] = {0.0, 0.8, 0.8, 0.8, 0.0,
+    0.0, 0.8, 0.0, 0.0, 0.0,
+    0.0, 0.0, 0.0, 0.8, 0.0,
+    0.0, 0.8, 0.0, 0.0, 0.0,
+    0.0, 0.0, 0.0, 0.8, 0.0};
+
+double padrao_8[25] = {0.0, 0.8, 0.8, 0.8, 0.0,
+    0.0, 0.8, 0.0, 0.8, 0.0,
+    0.0, 0.8, 0.8, 0.8, 0.0,
+    0.0, 0.8, 0.0, 0.8, 0.0,
+    0.0, 0.8, 0.8, 0.8, 0.0};
+
+double padrao_9[25] = {0.0, 0.8, 0.8, 0.8, 0.0,
+    0.0, 0.8, 0.0, 0.8, 0.0,
+    0.0, 0.8, 0.8, 0.8, 0.0,
+    0.0, 0.8, 0.0, 0.0, 0.0,
+    0.0, 0.8, 0.8, 0.8, 0.0};
+
+// Sequência de padrões para a animação
+double *padroes[] = {padrao_0, padrao_1, padrao_2, padrao_3, padrao_4, padrao_5,
+  padrao_6, padrao_7, padrao_8, padrao_9};
+
+// rotina para acionar a matrix de leds - ws2812b
+void apresentar_numero(PIO pio, uint sm, double r, double g, double b, int numero_apresentado)
 {
-    uint32_t valor_led;
-    const int delay_ms = 200; // Tempo entre os quadros da animação
-
-    // Define os padrões para a animação (quadrado azul em diferentes posições)
-    double padrao_1[25] = {1.0, 0.0, 0.0, 0.0, 0.0,
-                           1.0, 0.0, 0.0, 0.0, 0.0,
-                           1.0, 0.0, 0.0, 0.0, 0.0,
-                           1.0, 0.0, 0.0, 0.0, 0.0,
-                           1.0, 0.0, 0.0, 0.0, 0.0};
-
-    double padrao_2[25] = {1.0, 1.0, 0.0, 0.0, 0.0,
-                           1.0, 0.0, 0.0, 0.0, 0.0,
-                           1.0, 0.0, 0.0, 0.0, 0.0,
-                           1.0, 0.0, 0.0, 0.0, 0.0,
-                           1.0, 1.0, 0.0, 0.0, 0.0};
-
-    double padrao_3[25] = {1.0, 1.0, 1.0, 0.0, 0.0,
-                           1.0, 0.0, 0.0, 0.0, 0.0,
-                           1.0, 0.0, 0.0, 0.0, 0.0,
-                           1.0, 0.0, 0.0, 0.0, 0.0,
-                           1.0, 1.0, 1.0, 0.0, 0.0};
-
-    double padrao_4[25] = {1.0, 1.0, 1.0, 1.0, 0.0,
-                           1.0, 0.0, 0.0, 0.0, 0.0,
-                           1.0, 0.0, 0.0, 0.0, 0.0,
-                           1.0, 0.0, 0.0, 0.0, 0.0,
-                           1.0, 1.0, 1.0, 1.0, 0.0};
-
-    double padrao_5[25] = {1.0, 1.0, 1.0, 1.0, 1.0,
-                           1.0, 0.0, 0.0, 0.0, 1.0,
-                           1.0, 0.0, 0.0, 0.0, 1.0,
-                           1.0, 0.0, 0.0, 0.0, 1.0,
-                           1.0, 1.0, 1.0, 1.0, 1.0};
-
-    // Sequência de padrões para a animação
-    double *padroes[] = {padrao_1, padrao_2, padrao_3, padrao_4, padrao_5};
-    int num_padroes = sizeof(padroes) / sizeof(padroes[0]);
-
-    // Exibir os padrões em sequência
-    for (int ciclo = 0; ciclo < 3; ciclo++) // Repetir a animação 3 vezes
-    {
-        for (int i = 0; i < num_padroes; i++)
-        {
-            for (int j = 0; j < NUM_PIXELS; j++)
-            {
-                valor_led = matrix_rgb(b = padroes[i][24 - j], r, g); // Usa o padrão atual
-                pio_sm_put_blocking(pio, sm, valor_led);
-            }
-            sleep_ms(delay_ms); // Espera antes de passar para o próximo quadro
-        }
-    }
+uint32_t valor_led;
+for (int j = 0; j < NUM_PIXELS; j++)
+{
+valor_led = matrix_rgb(b , r= padroes[numero_apresentado][24 - j], g); // Usa o padrão atual
+pio_sm_put_blocking(pio, sm, valor_led);
+}
+}
+void limpa_matriz(PIO pio, uint sm)
+{
+uint32_t valor_led;
+for (int j = 0; j < NUM_PIXELS; j++)
+{
+valor_led = matrix_rgb(0.0 , 0.0, 0.0); // Usa o padrão atual
+pio_sm_put_blocking(pio, sm, valor_led);
+}
 }
 
 // rotina da interrupção
@@ -160,10 +190,27 @@ int main()
   ssd1306_send_data(&ssd);
 
   while (true)
-  { 
-    animacao_quadrado_azul(pio, sm, 0.0, 0.0, 1.0);
-    apresentar_display(ssd, "abcdefghijk", " lmnopqrst ", "uvwxyz");
-  }
+    {   
+        char c;
+        if (stdio_usb_connected())
+        { // Certifica-se de que o USB está conectado
+            printf("digite um caractere: \n");
+            if (c = getchar())
+            { // Lê caractere da entrada padrão
+                printf("Recebido: '%c'\n", c);
+                apresentar_display(ssd, "Caracter lido: ", &c, " ");
+                if(c >= '0' && c <= '9'){
+                    numero_apresentado = c - '0';
+                    printf("numero apresentado: %d\n", numero_apresentado);
+                    apresentar_numero(pio, sm, 1.0, 0.0, 0.0, numero_apresentado);
+                }
+                else{
+                    limpa_matriz(pio, sm);
+                }
+            }
+        }
+    }
+
 }
 
 // rotina de interrupção
